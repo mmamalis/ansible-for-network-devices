@@ -1,3 +1,4 @@
 generated_configs/*
 logging/*
 ansible.log
+library/*
