@@ -1,0 +1,8 @@
+# This playbook calls on all included plays.
+# makes sure the build directories are in place
+# generates the L3VPN configuration under /tmp
+# folder and finally uploads the final configuration
+# to the host
+- include: delete_generate.directories.yml
+- include: l3vpn.provision.yml
+- include: merge.plays.and.commit.yml

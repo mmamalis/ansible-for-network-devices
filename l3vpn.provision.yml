@@ -1,0 +1,10 @@
+# This play creates the configuration for a new service
+# specific to the l3vpn role
+---
+- name: Create configuration for new l3vpn service
+  hosts: l3vpn
+  connection: local
+  gather_facts: no
+  
+  roles:
+      - l3vpn

@@ -1,0 +1,65 @@
+logical-systems {
+    {# this configuration builds a new L3VPN service based on a already configured logical system #}
+    {{ service.hostname }} {
+        interfaces {
+        {# first build the interface configuration #}
+            {{ service.customer_interface }} {
+                unit {{ service.customer_vlan }} {
+                    description "[{{ service.subif_description }}]";
+                    vlan-id {{ service.customer_vlan }};
+                    family inet {
+                        address {{ service.nren_connected_ip }}{{ service.connected_subnet }};
+                    }
+                    {% if service.assigned_v6 %}
+                    family inet6 {
+                        address {{ service.nren_connected_ipv6 }}{{ service.connected_subnetv6 }};
+                    }
+                    {% endif %}
+                }
+            }
+        }
+        policy-options {
+        {# add the service assigned subnet to the BGP export policy towards the VRR#}
+            policy-statement {{ service.bgp_policy_vrrs_out }} {
+                term 1 {
+                    from {
+                        route-filter  {{ service.customer_subnet }} exact;
+                    }
+                }
+            }
+        }
+        routing-instances {
+        {# configure the routing instance for a new L3VPN service #}
+            {{ service.routing_instance_name }} {
+                instance-type vrf;
+                interface {{ service.customer_interface }}.{{ service.customer_vlan }};
+                route-distinguisher {{ service.loopback }}:{{ service.l3vpn_service_id }};
+                vrf-target target:{{ service.route_target }};
+                {# configure static routing in case no dynamic protocol is in use #}
+                {% if service.static_with_customer %}
+                routing-options {
+                    static {
+                        route {{ service.customer_subnet }} next-hop {{ service.customer_connected_ip }};
+                    }
+                }
+                {% endif %}
+                {# or else configure eBGP routing with L3VPN customer #}
+                {% if service.bgp_with_customer %}
+                protocols {
+                    bgp {
+                        group {{ service.routing_instance_name }} {
+                            type external;
+                            local-as {{ service.nren_asn }};
+                            neighbor {{ service.customer_connected_ip }} {
+                                description {{ service.routing_instance_name }};
+                                local-address {{ service.nren_connected_ip }};
+                                peer-as {{ service.customer_asn }};
+                            }
+                        }
+                    }
+                }
+                {% endif %}
+            }
+        }
+    }
+}
