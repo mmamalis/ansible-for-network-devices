@@ -1,0 +1,16 @@
+# The inventory file is grouped by site
+[all:children]
+site1
+
+# where each site can have multiple device families
+[site1:children]
+site1_mx
+
+# each device under device family goes in this group
+[site1_mx]
+router.site1
+
+# this group is service specific allowing all devices that are part
+# of a service to be grouped together
+[l3vpn:children]
+site1_mx

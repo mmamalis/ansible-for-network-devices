@@ -1,4 +1,4 @@
-generated_configs/*
-logging/*
-ansible.log
-library/*
+l3vpn_provisioning/generated_configs/*
+l3vpn_provisioning/logging/*
+l3vpn_provisioning/ansible.log
+l3vpn_provisioning/library/*
