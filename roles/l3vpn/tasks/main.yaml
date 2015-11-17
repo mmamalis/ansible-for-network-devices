@@ -1,8 +1,0 @@
----
-# by referencing the l3vpn role in a playbook
-# this task is executed causing Ansible to generate
-# configuration for a new L3VPN service
-- name: Building new l3vpn service configuration
-  template: >
-    src=l3vpn.conf.j2
-    dest={{ build_dir }}/l3vpn.conf
