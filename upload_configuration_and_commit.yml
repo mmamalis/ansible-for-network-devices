@@ -20,15 +20,6 @@
         prompt: Password
         private: yes
 
-
-  pre_tasks:
-
-    - name: "Retrieve current timestamp"
-      set_fact: 
-        timestamp: "{{lookup('pipe','date +%Y%m%d_%H%M%S')}}"
-        run_once: true
-
-
   tasks:
       - name: Connect over netconf and UPLOAD CONFIGURATION to the Network
         junos_install_config: 
@@ -39,7 +30,7 @@
             file: "{{ junos_conf }}"
             overwrite: no
             logfile: ./logging/upload_config_playbook
-            comment: "configured by {{ USERNAME }} through ansible, {{ timestamp }}"
+            comment: "configured by {{ USERNAME }} through ansible"
             diffs_file:  "{{ diffs_file }}"
             # timeout=5
         
