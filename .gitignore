@@ -1,2 +1,4 @@
 generated_config/*
 logging/*
+ansible.log
+.gitignore
