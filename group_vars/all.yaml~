@@ -1,0 +1,31 @@
+build_dir: ./generated_configs/{{ inventory_hostname }}
+junos_conf: ./generated_configs/{{ inventory_hostname }}/junos.conf
+
+global:
+    login_message: "\n\n\nGreek Research & Technology Network -- GRNET\n\n{{ inventory_hostname }}\n---------------------------------------------"
+    name_servers: 
+        - 194.177.210.10
+        - 194.177.210.211
+    radius_servers: 83.212.5.80
+    ntp_primary: 194.177.210.54
+    ntp_backup: 193.92.150.3
+    syslog_grnet: 194.177.210.148
+    syslog_lsbroker: 62.217.124.124
+    snmp:
+        contact: "noc@grnet.gr"
+        polling:
+            community: public
+            clients: 
+                - 83.212.4.78/32
+                - 194.177.210.132/32
+                - 194.177.211.163/32
+                - 194.177.211.179/32
+                - 194.177.210.34/32
+                - 194.177.210.168/32
+                - 83.212.2.134/32
+                - 83.212.4.76/32
+                - 83.212.4.77/32
+                - 194.177.210.164/32
+                - 62.217.124.126/32
+        traps:
+            target: 83.212.4.76

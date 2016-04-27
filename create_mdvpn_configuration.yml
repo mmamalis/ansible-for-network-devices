@@ -1,0 +1,48 @@
+################################################################################
+### CREATE MDVPN CONFIGURATION
+### ----------------------------------------------------------------------------
+### This playbook calls on the MDVPN role to create configuration for the MDVPN
+### service. The configuration is produced for specific network devices that 
+### share the same (mdvpn) role. 
+################################################################################
+
+- name: Create configuration for the MDVPN service
+  hosts: mdvpn_routers
+  connection: local
+  gather_facts: no
+
+############
+### Delete any previous directories and build new ones to store 
+### output from this playbook
+############
+  pre_tasks:
+    - name: Delete previous build directories
+      file: path={{ build_dir_part }} state=absent
+      file: path={{ build_dir_full }} state=absent
+      always_run: yes # run even in check_mode
+
+    - name: Create build directories
+      file: path={{ build_dir_part }} state=directory
+      always_run: yes # run even in check_mode  
+
+############
+### Define the role that will associate the 
+### network device we want with this playbook.
+############
+  roles:
+    - role: mdvpn
+
+############
+### Assemble all the files that are under /tmp folder into one large file 
+### playbook is run for the specific Data Center to be ready for upload to the network
+############
+  post_tasks:
+    - name: Assemble part configuration files and merge to one file
+      assemble: src={{ build_dir_part }} dest={{ junos_conf }}
+
+############
+### Check the part configuration file and replace comments marked with '#' 
+### so that ansible can upload the configuration
+############
+    - name: Replace comments "#" on local configuration file 
+      replace: dest={{ junos_conf }} regexp='(^#.*\n)' replace='' backup=no

@@ -1,0 +1,10 @@
+################################################################################
+### MAIN TASK FOR MDVPN SERVICE CONFIGURATION
+### ----------------------------------------------------------------------------
+### This file calls on MDVPN role and builds the configuration file
+################################################################################
+
+- name: Building new MDVPN service configuration
+  template: >
+    src=mdvpn.configuration_template.j2
+    dest={{ build_dir_part }}/mdvpn.configuration.set

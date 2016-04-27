@@ -1,0 +1,67 @@
+{##############################################################################
+{###	This template is called when the MDVPN role is referenced. 
+{### 	The output is a new configuration file for the MDVPN service based 
+{### 	on the variables that are set in the YAML file.
+{##############################################################################
+{##}
+{##}
+{##}
+{% for device, attribute in mdvpn_service.items() %}
+{% for instance, value in attribute.SERVICES.items() %}
+{##}
+{# Generate the routing-instance configuration #}
+{##}
+delete logical-systems {{ attribute.hostname }} routing-instances {{ instance }}
+{% for client, client_value in value.clients.items() %}
+{##}
+{# Generate the interface configuration #}
+{##}
+{% if client_value.interface is defined %}
+#
+# INTERFACE CONFIGURATION for {{ instance }} and client {{ client }}
+#
+delete logical-systems {{ attribute.hostname }} interfaces {{ client_value.interface[0].name }} unit {{ client_value.interface[0].subifce }}
+set logical-systems {{ attribute.hostname }} interfaces {{ client_value.interface[0].name }} unit {{ client_value.interface[0].subifce }} vlan-id {{ client_value.interface[0].vlan }}
+set logical-systems {{ attribute.hostname }} interfaces {{ client_value.interface[0].name }} unit {{ client_value.interface[0].subifce }} description "{{ client_value.interface[0].description }}"
+set logical-systems {{ attribute.hostname }} interfaces {{ client_value.interface[0].name }} unit {{ client_value.interface[0].subifce }} family inet mtu {{ client_value.interface[0].ip_mtu }}
+set logical-systems {{ attribute.hostname }} interfaces {{ client_value.interface[0].name }} unit {{ client_value.interface[0].subifce }} family inet address {{ client_value.ipv4_addressing[0].nren_address }}{{ client_value.ipv4_addressing[0].subnet }}
+{% endif %}
+#
+# LOGICAL SYSTEM CONFIGURATION for {{ instance }} and client {{ client }}
+#
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} instance-type vrf
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} interface {{ client_value.interface[0].name }}.{{ client_value.interface[0].subifce }}
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} route-distinguisher {{ value.routing_instance[0].route_distinguisher }}
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} vrf-target {{ value.routing_instance[0].route_target }}
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} vrf-table-label
+{##}
+{# Generate the configuration for the routing protocol based on what we have defined for each service #}
+{##}
+{% if client_value.routing_protocols[0].static_routing == 'True' %}
+#
+# STATIC ROUTING CONFIGURATION for {{ instance }}
+#
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} routing-options static route {{ client_value.routing_attributes[0].customer_subnet }} next-hop {{ client_value.ipv4_addressing[0].customer_address }}
+{% elif client_value.routing_protocols[0].bgp =='True' %}
+#
+# BGP ROUTING CONFIGURATION for {{ instance }} and client {{ client }}
+#
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} protocols bgp group {{ instance }}-clients type external
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} protocols bgp group {{ instance }}-clients neighbor {{ client_value.ipv4_addressing[0].customer_address }} description {{ client_value.routing_attributes[0].description }}
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} protocols bgp group {{ instance }}-clients neighbor {{ client_value.ipv4_addressing[0].customer_address }} local-address {{ client_value.ipv4_addressing[0].nren_address }}
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} protocols bgp group {{ instance }}-clients neighbor {{ client_value.ipv4_addressing[0].customer_address }} peer-as {{ client_value.routing_attributes[0].customer_asnumber }}
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} routing-options autonomous-system {{ client_value.routing_attributes[0].nren_asnumber }}
+{% elif client_value.routing_protocols[0].ospf =='True' %}
+#
+# OSPF ROUTING CONFIGURATION for {{ instance }} and client {{ client }}
+#
+set logical-systems {{ attribute.hostname }} routing-instances {{ instance }} protocols ospf area {{ client_value.routing_attributes[0].ospf_area }} interface {{ client_value.interface[0].name }}.{{ client_value.interface[0].subifce }}
+{% endif %}
+#
+# FINALLY UPDATE POLICY FOR ADVERTISED ROUTES TOWARDS MDVPN VRRS for {{ instance }} and client {{ client }}
+#
+delete logical-systems {{ attribute.hostname }} policy-options policy-statement {{ value.policy_to_vrrs[0].name }} term {{ value.policy_to_vrrs[0].accept_term }} from route-filter {{ client_value.routing_attributes[0].customer_subnet }} exact
+set logical-systems {{ attribute.hostname }} policy-options policy-statement {{ value.policy_to_vrrs[0].name }} term {{ value.policy_to_vrrs[0].accept_term }} from route-filter {{ client_value.routing_attributes[0].customer_subnet }} exact
+{% endfor %}
+{% endfor %}
+{% endfor %}

@@ -1,0 +1,85 @@
+################################################################################
+#### Each MDPVN SERVICE instance is described in this file
+#### ----------------------------------------------------------------------------
+#### This file has all variables (e.g. routing instance, interfaces, routing 
+#### protocols) for each service instance.
+#### The service instances belong to a specific network device.
+################################################################################
+
+
+mdvpn_service:
+    ############
+    #### Start by describing the device that delivers the service
+    #### and fill-in some device attributes we need. 
+    #### Each service instance belongs to a device and is described 
+    #### in the parts that follow. 
+    ############
+    NETWORK_DEVICE:
+        hostname: "vpn-router"
+        is_logical_system: "True"
+        loopback_v4: "7.7.7.7"
+        as_number: "65100"
+    ############
+    #### Now start describing each service instance that is delivered
+    #### from this device.
+    #### Each instance has a unique set of values that are described
+    #### in the appropriate fields, some values are unique per routing instance and
+    #### some values are different per customer of the routing instance.
+    #### So each routing instance can have multiple customers.
+    #### 
+    #### The fields must always be populated by some value.
+    #### Regarding routing protocols only one protocol can be declared as "True" for 
+    #### a specific service instance.
+    ############
+        SERVICES:
+            ####
+            ## TEST1 routing instance
+            ####
+            test1:
+                routing_instance:
+                    - { name: test1, route_distinguisher: "1.1.1.1:111", route_target: "target:2222:3333", bgp_policy_towards_vrrs: "vrrs-out" }        
+                policy_to_vrrs: 
+                    - { name: "vrrs-out", accept_term: "1", community_name: "vrrs-community", community_members: "20000:65888" }
+                clients:
+                    test_client5:
+                        interface: 
+                            - { name: "ge-1/1/1",  subifce: "578", description: "Access Link to Test1 VRF", vlan: 578, ip_mtu: "1500" }
+                        ipv4_addressing: 
+                            - { nren_address: "10.0.0.1", customer_address: "10.0.0.2", subnet: "/24" }
+                        ipv6_addressing: 
+                            - { nren_address: "False", customer_address: "False", subnet: "False" }
+                        routing_protocols:
+                            - { bgp: "False", static_routing: "True", ospf: "False" } 
+                        routing_attributes:
+                            - { nren_asnumber: "65100", customer_asnumber: "65000", customer_subnet: "10.0.0.0/24", description: "TEST1", ospf_area: "False" }
+            ####
+            ## TEST2 routing instance 
+            ####
+            test2:
+                routing_instance:
+                    - { name: test2, route_distinguisher: "1.1.1.1:1", route_target: "target:3333:44", bgp_policy_towards_vrrs: "vrrs-out" }        
+                policy_to_vrrs: 
+                    - { name: "vrrs-out", accept_term: "1", community_name: "vrrs-community", community_members: "20000:65888" }
+                clients:
+                    test_client1:
+                        interface: 
+                            - { name: "ge-2/2/2",  subifce: "561", description: "Access Link to Test2 VRF", vlan: 561, ip_mtu: "1500" }
+                        ipv4_addressing: 
+                            - { nren_address: "192.168.168.5", customer_address: "192.168.168.6", subnet: "/30" }
+                        ipv6_addressing: 
+                            - { nren_address: "False", customer_address: "False", subnet: "False" }
+                        routing_protocols:
+                            - { bgp: "True", static_routing: "False", ospf: "False" } 
+                        routing_attributes:
+                            - { nren_asnumber: "65100", customer_asnumber: "65000", customer_subnet: "10.1.16.0/20", description: "TEST2", ospf_area: "False" }
+                    test_client2:
+                        interface: 
+                            - { name: "ge-3/3/3",  subifce: "565", description: "Access Link to Test2 VRF", vlan: 565, ip_mtu: "1500" }
+                        ipv4_addressing: 
+                            - { nren_address: "192.168.168.9", customer_address: "192.168.168.10", subnet: "/30" }
+                        ipv6_addressing: 
+                            - { nren_address: "False", customer_address: "False", subnet: "False" }
+                        routing_protocols:
+                            - { bgp: "False", static_routing: "True", ospf: "False" } 
+                        routing_attributes:
+                            - { nren_asnumber: "False", customer_asnumber: "False", customer_subnet: "10.0.208.0/20", description: "xifi-unipi", ospf_area: "False" }                           

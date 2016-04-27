@@ -1,0 +1,21 @@
+################################################################################
+### Variables that apply to all playbooks independent or roles
+################################################################################
+
+# this is the local folder used to store the partial configuration files generated with Ansible
+build_dir_part: ./generated_configs/{{ inventory_hostname }}/part
+
+# this is the local folder used to store the full configuration files assembled from partial files
+build_dir_full: ./generated_configs/{{ inventory_hostname }}/
+
+# this is the full configuration files assembled from partial files
+junos_conf: ./generated_configs/{{ inventory_hostname }}/{{ inventory_hostname }}.full.set
+
+# this is the local folder used to store the configuration collected from the network devices
+collected_configs_dir: ./collected_configs/
+
+# this is the local folder used for logging per inventory_hostname
+logs_file: ./logging/{{ inventory_hostname }}.log
+
+# this is the local folder used for storing diffs files when a playbook is run in check (-C) mode
+diffs_file: ./diffs/{{ timestamp }}_{{ inventory_hostname }}.diff

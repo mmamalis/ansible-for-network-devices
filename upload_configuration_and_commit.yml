@@ -1,0 +1,47 @@
+################################################################################
+### UPLOAD CONFIGURATION FROM LOCAL FILES TO THE NETWORK USING JUNIPER MODULE
+### ----------------------------------------------------------------------------
+### This playbook gets the local files already generated with Ansible and pushes
+### the configuration to the network devices.
+################################################################################
+
+
+- name: UPLOAD CONFIGURATION TO NETWORK DEVICES
+  hosts: all
+  roles:
+    - Juniper.junos
+  connection: local
+  gather_facts: no
+  vars_prompt:
+      - name: USERNAME
+        prompt: Radius user
+        private: no
+      - name: PASSWORD
+        prompt: Password
+        private: yes
+
+
+  pre_tasks:
+
+    - name: "Retrieve current timestamp"
+      set_fact: 
+        timestamp: "{{lookup('pipe','date +%Y%m%d_%H%M%S')}}"
+        run_once: true
+
+
+  tasks:
+      - name: Connect over netconf and UPLOAD CONFIGURATION to the Network
+        junos_install_config: 
+            host: "{{ inventory_hostname }}"
+            port: 22
+            user: "{{ USERNAME }}"
+            passwd: "{{ PASSWORD }}"
+            file: "{{ junos_conf }}"
+            overwrite: no
+            logfile: ./logging/upload_config_playbook
+            comment: "configured by {{ USERNAME }} through ansible, {{ timestamp }}"
+            diffs_file:  "{{ diffs_file }}"
+            # timeout=5
+        
+
+

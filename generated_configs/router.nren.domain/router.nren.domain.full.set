@@ -1,0 +1,45 @@
+delete logical-systems vpn-router routing-instances test1
+delete logical-systems vpn-router interfaces ge-1/1/1 unit 578
+set logical-systems vpn-router interfaces ge-1/1/1 unit 578 vlan-id 578
+set logical-systems vpn-router interfaces ge-1/1/1 unit 578 description "Access Link to Test1 VRF"
+set logical-systems vpn-router interfaces ge-1/1/1 unit 578 family inet mtu 1500
+set logical-systems vpn-router interfaces ge-1/1/1 unit 578 family inet address 10.0.0.1/24
+set logical-systems vpn-router routing-instances test1 instance-type vrf
+set logical-systems vpn-router routing-instances test1 interface ge-1/1/1.578
+set logical-systems vpn-router routing-instances test1 route-distinguisher 1.1.1.1:111
+set logical-systems vpn-router routing-instances test1 vrf-target target:2222:3333
+set logical-systems vpn-router routing-instances test1 vrf-table-label
+set logical-systems vpn-router routing-instances test1 routing-options static route 10.0.0.0/24 next-hop 10.0.0.2
+delete logical-systems vpn-router policy-options policy-statement vrrs-out term 1 from route-filter 10.0.0.0/24 exact
+set logical-systems vpn-router policy-options policy-statement vrrs-out term 1 from route-filter 10.0.0.0/24 exact
+delete logical-systems vpn-router routing-instances test2
+delete logical-systems vpn-router interfaces ge-3/3/3 unit 565
+set logical-systems vpn-router interfaces ge-3/3/3 unit 565 vlan-id 565
+set logical-systems vpn-router interfaces ge-3/3/3 unit 565 description "Access Link to Test2 VRF"
+set logical-systems vpn-router interfaces ge-3/3/3 unit 565 family inet mtu 1500
+set logical-systems vpn-router interfaces ge-3/3/3 unit 565 family inet address 192.168.168.9/30
+set logical-systems vpn-router routing-instances test2 instance-type vrf
+set logical-systems vpn-router routing-instances test2 interface ge-3/3/3.565
+set logical-systems vpn-router routing-instances test2 route-distinguisher 1.1.1.1:1
+set logical-systems vpn-router routing-instances test2 vrf-target target:3333:44
+set logical-systems vpn-router routing-instances test2 vrf-table-label
+set logical-systems vpn-router routing-instances test2 routing-options static route 10.0.208.0/20 next-hop 192.168.168.10
+delete logical-systems vpn-router policy-options policy-statement vrrs-out term 1 from route-filter 10.0.208.0/20 exact
+set logical-systems vpn-router policy-options policy-statement vrrs-out term 1 from route-filter 10.0.208.0/20 exact
+delete logical-systems vpn-router interfaces ge-2/2/2 unit 561
+set logical-systems vpn-router interfaces ge-2/2/2 unit 561 vlan-id 561
+set logical-systems vpn-router interfaces ge-2/2/2 unit 561 description "Access Link to Test2 VRF"
+set logical-systems vpn-router interfaces ge-2/2/2 unit 561 family inet mtu 1500
+set logical-systems vpn-router interfaces ge-2/2/2 unit 561 family inet address 192.168.168.5/30
+set logical-systems vpn-router routing-instances test2 instance-type vrf
+set logical-systems vpn-router routing-instances test2 interface ge-2/2/2.561
+set logical-systems vpn-router routing-instances test2 route-distinguisher 1.1.1.1:1
+set logical-systems vpn-router routing-instances test2 vrf-target target:3333:44
+set logical-systems vpn-router routing-instances test2 vrf-table-label
+set logical-systems vpn-router routing-instances test2 protocols bgp group test2-clients type external
+set logical-systems vpn-router routing-instances test2 protocols bgp group test2-clients neighbor 192.168.168.6 description TEST2
+set logical-systems vpn-router routing-instances test2 protocols bgp group test2-clients neighbor 192.168.168.6 local-address 192.168.168.5
+set logical-systems vpn-router routing-instances test2 protocols bgp group test2-clients neighbor 192.168.168.6 peer-as 65000
+set logical-systems vpn-router routing-instances test2 routing-options autonomous-system 65100
+delete logical-systems vpn-router policy-options policy-statement vrrs-out term 1 from route-filter 10.1.16.0/20 exact
+set logical-systems vpn-router policy-options policy-statement vrrs-out term 1 from route-filter 10.1.16.0/20 exact
